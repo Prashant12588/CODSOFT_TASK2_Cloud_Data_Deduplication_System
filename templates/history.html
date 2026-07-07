@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+{% include 'sidebar.html' %}
+
+<main class="main-content">
+    <section class="hero">
+        <h1>Upload History</h1>
+        <p>All CSV uploads processed by the deduplication system.</p>
+    </section>
+
+    <section class="table-panel">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Filename</th>
+                    <th>Total Records</th>
+                    <th>Unique</th>
+                    <th>Duplicates</th>
+                    <th>Uploaded At</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for row in history %}
+                <tr>
+                    <td>{{ row[0] }}</td>
+                    <td>{{ row[1] }}</td>
+                    <td>{{ row[2] }}</td>
+                    <td>{{ row[3] }}</td>
+                    <td>{{ row[4] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</main>
+
+</body>
+</html>

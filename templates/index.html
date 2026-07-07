@@ -6,46 +6,40 @@
 </head>
 <body>
 
-<nav class="navbar">
-    <div class="logo">☁️ Cloud Deduplication</div>
-    <div class="user">👤 Prashant Yadav</div>
-</nav>
+{% include 'sidebar.html' %}
 
-<div class="container">
-    <div class="card upload-card">
-        <h1>Cloud Data Deduplication System</h1>
-        <p class="subtitle">Upload a CSV file to detect duplicate records using SHA-256 hashing.</p>
+<main class="main-content">
+    <div class="container">
+        <div class="card upload-card">
+            <h1>Cloud Data Deduplication System</h1>
+            <p class="subtitle">Upload a CSV file to detect duplicate records using SHA-256 hashing.</p>
 
-        {% if error %}
-            <div class="error">{{ error }}</div>
-        {% endif %}
+            {% if error %}
+                <div class="error">{{ error }}</div>
+            {% endif %}
 
-        <form action="/upload" method="POST" enctype="multipart/form-data" id="uploadForm">
+            <form action="/upload" method="POST" enctype="multipart/form-data" id="uploadForm">
+                <label for="file-upload" class="drop-area" id="dropArea">
+                    <div class="upload-icon">☁️</div>
+                    <h2>Drag & Drop CSV File Here</h2>
+                    <p>or click to browse your file</p>
+                    <span id="file-name">No file selected</span>
+                </label>
 
-            <label for="file-upload" class="drop-area" id="dropArea">
-                <div class="upload-icon">☁️</div>
-                <h2>Drag & Drop CSV File Here</h2>
-                <p>or click to browse your file</p>
-                <span id="file-name">No file selected</span>
-            </label>
+                <input id="file-upload" type="file" name="file" accept=".csv" required>
 
-            <input id="file-upload" type="file" name="file" accept=".csv" required>
+                <button type="submit" id="uploadBtn">Upload & Analyze</button>
 
-            <button type="submit" id="uploadBtn">Upload & Analyze</button>
-
-            <div class="loader" id="loader">
-                <p>Analyzing file...</p>
-                <div class="progress-bar">
-                    <div class="progress-fill"></div>
+                <div class="loader" id="loader">
+                    <p>Analyzing file...</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill loading-fill"></div>
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
-
-<footer>
-    © 2026 Prashant Yadav | CodSoft Cloud Computing Internship
-</footer>
+</main>
 
 <script>
 const fileInput = document.getElementById("file-upload");

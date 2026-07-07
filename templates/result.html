@@ -7,13 +7,9 @@
 </head>
 <body>
 
-<nav class="navbar">
-    <div class="logo">☁️ Cloud Data Deduplication</div>
-    <div class="user">👤 Prashant Yadav</div>
-</nav>
+{% include 'sidebar.html' %}
 
-<main class="dashboard">
-
+<main class="main-content">
     <section class="hero">
         <h1>Deduplication Dashboard</h1>
         <p>Analyzed file: <strong>{{ filename }}</strong></p>
@@ -87,12 +83,7 @@
     </section>
 
     <a href="/" class="back-btn">⬅ Upload Another File</a>
-
 </main>
-
-<footer>
-    © 2026 Prashant Yadav | CodSoft Cloud Computing Internship
-</footer>
 
 <script>
 new Chart(document.getElementById('dedupChart'), {
@@ -109,9 +100,7 @@ new Chart(document.getElementById('dedupChart'), {
     options: {
         plugins: {
             legend: {
-                labels: {
-                    color: '#e5e7eb'
-                }
+                labels: { color: '#e5e7eb' }
             }
         }
     }

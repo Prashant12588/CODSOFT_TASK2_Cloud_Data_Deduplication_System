@@ -3,10 +3,12 @@ import pandas as pd
 import hashlib
 import sqlite3
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 
 DB_PATH = "database/deduplication.db"
+os.makedirs("database", exist_ok=True)
 
 
 def init_db():
@@ -53,15 +55,15 @@ def upload_file():
     file = request.files.get("file")
 
     if not file or file.filename == "":
-        return render_template("index.html", error="No file selected. Please upload a CSV file.")
+        return render_template("index.html", error="No file selected.")
 
     if not file.filename.lower().endswith(".csv"):
-        return render_template("index.html", error="Invalid file type. Please upload only CSV files.")
+        return render_template("index.html", error="Only CSV files are allowed.")
 
     try:
         df = pd.read_csv(file)
     except Exception:
-        return render_template("index.html", error="Could not read CSV file. Please upload a valid CSV.")
+        return render_template("index.html", error="Invalid CSV file.")
 
     if df.empty:
         return render_template("index.html", error="CSV file is empty.")
@@ -82,14 +84,14 @@ def upload_file():
                 INSERT INTO records (record_hash, record_data, uploaded_file, uploaded_at)
                 VALUES (?, ?, ?, ?)
             """, (record_hash, record_data, file.filename, uploaded_at))
-
             unique_rows.append(row)
 
         except sqlite3.IntegrityError:
             duplicate_rows.append(row)
 
     cursor.execute("""
-        INSERT INTO upload_history (filename, total_records, unique_records, duplicate_records, uploaded_at)
+        INSERT INTO upload_history
+        (filename, total_records, unique_records, duplicate_records, uploaded_at)
         VALUES (?, ?, ?, ?, ?)
     """, (
         file.filename,
@@ -118,6 +120,23 @@ def upload_file():
         unique_table=unique_df.to_html(classes="data-table", index=False) if not unique_df.empty else "<p>No new unique records.</p>",
         duplicate_table=duplicate_df.to_html(classes="data-table", index=False) if not duplicate_df.empty else "<p>No duplicate records found.</p>"
     )
+
+
+@app.route("/history")
+def upload_history():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT filename, total_records, unique_records, duplicate_records, uploaded_at
+        FROM upload_history
+        ORDER BY id DESC
+    """)
+
+    history = cursor.fetchall()
+    conn.close()
+
+    return render_template("history.html", history=history)
 
 
 if __name__ == "__main__":
