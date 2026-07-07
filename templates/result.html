@@ -1,46 +1,98 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Deduplication Result</title>
+    <title>Deduplication Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-<div class="container wide">
-    <div class="card">
-        <h1>Deduplication Result</h1>
-        <p class="subtitle">File analyzed: <strong>{{ filename }}</strong></p>
+<nav class="navbar">
+    <div class="logo">☁️ Cloud Deduplication</div>
+    <div class="user">👤 Prashant Yadav</div>
+</nav>
 
-        <div class="stats">
-            <div class="stat-box">
-                <h2>{{ stats.total }}</h2>
-                <p>Total Records</p>
-            </div>
+<div class="dashboard">
 
-            <div class="stat-box success">
-                <h2>{{ stats.unique }}</h2>
-                <p>Unique Records</p>
-            </div>
+    <section class="hero">
+        <h1>Deduplication Dashboard</h1>
+        <p>File analyzed: <strong>{{ filename }}</strong></p>
+    </section>
 
-            <div class="stat-box danger">
-                <h2>{{ stats.duplicates }}</h2>
-                <p>Duplicate Records</p>
-            </div>
+    <section class="stats">
+        <div class="stat-card total">
+            <span>📄</span>
+            <h2>{{ stats.total }}</h2>
+            <p>Total Records</p>
         </div>
 
-        <h2>Unique Data</h2>
-        <div class="table-wrapper">
+        <div class="stat-card unique">
+            <span>✅</span>
+            <h2>{{ stats.unique }}</h2>
+            <p>Unique Records</p>
+        </div>
+
+        <div class="stat-card duplicate">
+            <span>⚠️</span>
+            <h2>{{ stats.duplicates }}</h2>
+            <p>Duplicate Records</p>
+        </div>
+    </section>
+
+    <section class="chart-section">
+        <h2>Upload Summary</h2>
+        <canvas id="dedupChart"></canvas>
+    </section>
+
+    <section class="table-section">
+        <h2>✅ Unique Records</h2>
+        <input type="text" class="search-box" placeholder="Search unique records..." onkeyup="searchTable(this, 'uniqueTable')">
+        <div class="table-wrapper" id="uniqueTable">
             {{ unique_table | safe }}
         </div>
+    </section>
 
-        <h2>Duplicate Data</h2>
-        <div class="table-wrapper">
+    <section class="table-section duplicate-table">
+        <h2>⚠️ Duplicate Records</h2>
+        <input type="text" class="search-box" placeholder="Search duplicate records..." onkeyup="searchTable(this, 'duplicateTable')">
+        <div class="table-wrapper" id="duplicateTable">
             {{ duplicate_table | safe }}
         </div>
+    </section>
 
-        <a href="/" class="back-btn">Upload Another File</a>
-    </div>
+    <a href="/" class="back-btn">⬅ Upload Another File</a>
+
 </div>
+
+<footer>
+    © 2026 Prashant Yadav | CodSoft Cloud Computing Internship
+</footer>
+
+<script>
+const ctx = document.getElementById('dedupChart');
+
+new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Unique Records', 'Duplicate Records'],
+        datasets: [{
+            data: [{{ stats.unique }}, {{ stats.duplicates }}],
+            borderWidth: 2
+        }]
+    }
+});
+
+function searchTable(input, tableId) {
+    let filter = input.value.toLowerCase();
+    let tableDiv = document.getElementById(tableId);
+    let rows = tableDiv.getElementsByTagName("tr");
+
+    for (let i = 1; i < rows.length; i++) {
+        let text = rows[i].textContent.toLowerCase();
+        rows[i].style.display = text.includes(filter) ? "" : "none";
+    }
+}
+</script>
 
 </body>
 </html>

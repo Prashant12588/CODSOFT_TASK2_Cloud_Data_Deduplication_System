@@ -6,8 +6,13 @@
 </head>
 <body>
 
+<nav class="navbar">
+    <div class="logo">☁️ Cloud Deduplication</div>
+    <div class="user">👤 Prashant Yadav</div>
+</nav>
+
 <div class="container">
-    <div class="card">
+    <div class="card upload-card">
         <h1>Cloud Data Deduplication System</h1>
         <p class="subtitle">Upload a CSV file to detect duplicate records using SHA-256 hashing.</p>
 
@@ -15,34 +20,72 @@
             <div class="error">{{ error }}</div>
         {% endif %}
 
-        <form action="/upload" method="POST" enctype="multipart/form-data">
-<label for="file-upload" class="custom-file-upload">
-    📂 Choose CSV File
-</label>
+        <form action="/upload" method="POST" enctype="multipart/form-data" id="uploadForm">
 
-<input
-    id="file-upload"
-    type="file"
-    name="file"
-    accept=".csv"
-    required
->
-<span id="file-name">No file selected</span>
-            <button type="submit">Upload & Analyze</button>
+            <label for="file-upload" class="drop-area" id="dropArea">
+                <div class="upload-icon">☁️</div>
+                <h2>Drag & Drop CSV File Here</h2>
+                <p>or click to browse your file</p>
+                <span id="file-name">No file selected</span>
+            </label>
+
+            <input id="file-upload" type="file" name="file" accept=".csv" required>
+
+            <button type="submit" id="uploadBtn">Upload & Analyze</button>
+
+            <div class="loader" id="loader">
+                <p>Analyzing file...</p>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+            </div>
         </form>
     </div>
 </div>
+
+<footer>
+    © 2026 Prashant Yadav | CodSoft Cloud Computing Internship
+</footer>
+
 <script>
 const fileInput = document.getElementById("file-upload");
 const fileName = document.getElementById("file-name");
+const dropArea = document.getElementById("dropArea");
+const form = document.getElementById("uploadForm");
+const loader = document.getElementById("loader");
+const uploadBtn = document.getElementById("uploadBtn");
 
 fileInput.addEventListener("change", function () {
     if (this.files.length > 0) {
         fileName.textContent = this.files[0].name;
-    } else {
-        fileName.textContent = "No file selected";
     }
 });
+
+dropArea.addEventListener("dragover", function(e) {
+    e.preventDefault();
+    dropArea.classList.add("active");
+});
+
+dropArea.addEventListener("dragleave", function() {
+    dropArea.classList.remove("active");
+});
+
+dropArea.addEventListener("drop", function(e) {
+    e.preventDefault();
+    dropArea.classList.remove("active");
+
+    if (e.dataTransfer.files.length > 0) {
+        fileInput.files = e.dataTransfer.files;
+        fileName.textContent = e.dataTransfer.files[0].name;
+    }
+});
+
+form.addEventListener("submit", function() {
+    loader.style.display = "block";
+    uploadBtn.disabled = true;
+    uploadBtn.textContent = "Processing...";
+});
 </script>
+
 </body>
 </html>
