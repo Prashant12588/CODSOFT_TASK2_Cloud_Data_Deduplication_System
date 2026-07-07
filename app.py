@@ -138,6 +138,21 @@ def upload_history():
 
     return render_template("history.html", history=history)
 
+@app.route("/database")
+def database_records():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT id, record_hash, uploaded_file, uploaded_at
+        FROM records
+        ORDER BY id DESC
+    """)
+
+    records = cursor.fetchall()
+    conn.close()
+
+    return render_template("database.html", records=records)
 
 if __name__ == "__main__":
     init_db()

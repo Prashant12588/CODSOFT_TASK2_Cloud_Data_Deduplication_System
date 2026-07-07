@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Database Records</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+{% include 'sidebar.html' %}
+
+<main class="main-content">
+    <section class="hero">
+        <h1>Database Records</h1>
+        <p>All unique records stored after SHA-256 deduplication.</p>
+    </section>
+
+    <section class="table-panel">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Record Hash</th>
+                    <th>Uploaded File</th>
+                    <th>Uploaded At</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for row in records %}
+                <tr>
+                    <td>{{ row[0] }}</td>
+                    <td>{{ row[1][:20] }}...</td>
+                    <td>{{ row[2] }}</td>
+                    <td>{{ row[3] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</main>
+
+</body>
+</html>
