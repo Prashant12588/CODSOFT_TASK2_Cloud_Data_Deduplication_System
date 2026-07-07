@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analytics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+{% include 'sidebar.html' %}
+
+<main class="main-content">
+    <section class="hero">
+        <h1>Cloud Analytics</h1>
+        <p>Overall deduplication performance and upload insights.</p>
+    </section>
+
+    <section class="stats-grid">
+        <div class="metric-card blue">
+            <span>📤</span>
+            <h2>{{ stats.uploads }}</h2>
+            <p>Total Uploads</p>
+        </div>
+
+        <div class="metric-card green">
+            <span>✅</span>
+            <h2>{{ stats.unique }}</h2>
+            <p>Unique Stored</p>
+        </div>
+
+        <div class="metric-card red">
+            <span>⚠️</span>
+            <h2>{{ stats.duplicates }}</h2>
+            <p>Duplicates Removed</p>
+        </div>
+
+        <div class="metric-card orange">
+            <span>💾</span>
+            <h2>{{ stats.storage_saved }} KB</h2>
+            <p>Storage Saved</p>
+        </div>
+    </section>
+
+    <section class="analytics-grid">
+        <div class="panel">
+            <h2>Record Distribution</h2>
+            <canvas id="analyticsChart"></canvas>
+        </div>
+
+        <div class="panel">
+            <h2>Top Uploaded Files</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Filename</th>
+                        <th>Uploads</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for file in top_files %}
+                    <tr>
+                        <td>{{ file[0] }}</td>
+                        <td>{{ file[1] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<script>
+new Chart(document.getElementById('analyticsChart'), {
+    type: 'bar',
+    data: {
+        labels: ['Total Records', 'Unique Records', 'Duplicates'],
+        datasets: [{
+            label: 'Records',
+            data: [{{ stats.records }}, {{ stats.unique }}, {{ stats.duplicates }}],
+            backgroundColor: ['#38bdf8', '#22c55e', '#ef4444']
+        }]
+    },
+    options: {
+        plugins: {
+            legend: {
+                labels: { color: '#e5e7eb' }
+            }
+        },
+        scales: {
+            x: {
+                ticks: { color: '#e5e7eb' }
+            },
+            y: {
+                ticks: { color: '#e5e7eb' }
+            }
+        }
+    }
+});
+</script>
+
+</body>
+</html>

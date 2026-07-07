@@ -160,6 +160,43 @@ def database_records():
     conn.close()
 
     return render_template("database.html", records=records)
+@app.route("/analytics")
+def analytics():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT 
+            COUNT(*),
+            COALESCE(SUM(total_records), 0),
+            COALESCE(SUM(unique_records), 0),
+            COALESCE(SUM(duplicate_records), 0)
+        FROM upload_history
+    """)
+    total_uploads, total_records, total_unique, total_duplicates = cursor.fetchone()
+
+    cursor.execute("""
+        SELECT filename, COUNT(*) as upload_count
+        FROM upload_history
+        GROUP BY filename
+        ORDER BY upload_count DESC
+        LIMIT 5
+    """)
+    top_files = cursor.fetchall()
+
+    conn.close()
+
+    storage_saved_kb = round(total_duplicates * 0.25, 2)
+
+    stats = {
+        "uploads": total_uploads,
+        "records": total_records,
+        "unique": total_unique,
+        "duplicates": total_duplicates,
+        "storage_saved": storage_saved_kb
+    }
+
+    return render_template("analytics.html", stats=stats, top_files=top_files)
 
 if __name__ == "__main__":
     init_db()
