@@ -1,3 +1,6 @@
+from flask import Response
+import csv
+import io
 from flask import Flask, render_template, request
 import pandas as pd
 import hashlib
@@ -197,7 +200,106 @@ def analytics():
     }
 
     return render_template("analytics.html", stats=stats, top_files=top_files)
+@app.route("/export/history")
+def export_history():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
 
+    cursor.execute("""
+        SELECT filename, total_records, unique_records, duplicate_records, uploaded_at
+        FROM upload_history
+        ORDER BY id DESC
+    """)
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    writer.writerow(["Filename", "Total Records", "Unique Records", "Duplicate Records", "Uploaded At"])
+    writer.writerows(rows)
+
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment; filename=upload_history.csv"}
+    )
+@app.route("/export/database")
+def export_database():
+
+    conn = sqlite3.connect(DB_PATH)
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT id,record_hash,record_data,uploaded_file,uploaded_at
+        FROM records
+    """)
+
+    rows = cursor.fetchall()
+
+    conn.close()
+
+    output=io.StringIO()
+
+    writer=csv.writer(output)
+
+    writer.writerow([
+        "ID",
+        "Hash",
+        "Record Data",
+        "Uploaded File",
+        "Uploaded At"
+    ])
+
+    writer.writerows(rows)
+
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={
+            "Content-Disposition":"attachment; filename=database_records.csv"
+        }
+    )
+@app.route("/export/duplicates")
+def export_duplicates():
+
+    conn=sqlite3.connect(DB_PATH)
+
+    cursor=conn.cursor()
+
+    cursor.execute("""
+        SELECT filename,
+               duplicate_records,
+               uploaded_at
+        FROM upload_history
+        WHERE duplicate_records>0
+    """)
+
+    rows=cursor.fetchall()
+
+    conn.close()
+
+    output=io.StringIO()
+
+    writer=csv.writer(output)
+
+    writer.writerow([
+        "Filename",
+        "Duplicate Records",
+        "Uploaded At"
+    ])
+
+    writer.writerows(rows)
+
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={
+            "Content-Disposition":"attachment; filename=duplicate_summary.csv"
+        }
+    )
 if __name__ == "__main__":
     init_db()
     app.run(debug=True)
