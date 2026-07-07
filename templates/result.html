@@ -22,19 +22,19 @@
     <section class="stats">
         <div class="stat-card total">
             <span>📄</span>
-            <h2>{{ stats.total }}</h2>
+        <h2 class="counter" data-target="{{ stats.total }}">0</h2>
             <p>Total Records</p>
         </div>
 
         <div class="stat-card unique">
             <span>✅</span>
-            <h2>{{ stats.unique }}</h2>
+      <h2 class="counter" data-target="{{ stats.unique }}">0</h2>
             <p>Unique Records</p>
         </div>
 
         <div class="stat-card duplicate">
             <span>⚠️</span>
-            <h2>{{ stats.duplicates }}</h2>
+      <h2 class="counter" data-target="{{ stats.duplicates }}">0</h2>
             <p>Duplicate Records</p>
         </div>
     </section>
@@ -63,7 +63,11 @@
     <a href="/" class="back-btn">⬅ Upload Another File</a>
 
 </div>
-
+  <div class="stat-card saved">
+    <span>💾</span>
+    <h2 class="counter" data-target="{{ stats.duplicates }}">0</h2>
+    <p>Storage Saved Records</p>
+  </div>
 <footer>
     © 2026 Prashant Yadav | CodSoft Cloud Computing Internship
 </footer>
@@ -92,7 +96,27 @@ function searchTable(input, tableId) {
         rows[i].style.display = text.includes(filter) ? "" : "none";
     }
 }
-</script>
+const counters = document.querySelectorAll(".counter");
 
+counters.forEach(counter => {
+    const target = +counter.getAttribute("data-target");
+    let count = 0;
+    const speed = 30;
+
+    const updateCounter = () => {
+        const increment = Math.ceil(target / speed);
+
+        if (count < target) {
+            count += increment;
+            counter.innerText = count > target ? target : count;
+            setTimeout(updateCounter, 25);
+        } else {
+            counter.innerText = target;
+        }
+    };
+
+    updateCounter();
+});
+</script>
 </body>
 </html>

@@ -377,3 +377,6 @@ footer {
         width: 100%;
     }
 }
+.stat-card.saved h2 {
+    color: #f59e0b;
+}
