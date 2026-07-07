@@ -8,43 +8,69 @@
 <body>
 
 <nav class="navbar">
-    <div class="logo">☁️ Cloud Deduplication</div>
+    <div class="logo">☁️ Cloud Data Deduplication</div>
     <div class="user">👤 Prashant Yadav</div>
 </nav>
 
-<div class="dashboard">
+<main class="dashboard">
 
     <section class="hero">
         <h1>Deduplication Dashboard</h1>
-        <p>File analyzed: <strong>{{ filename }}</strong></p>
+        <p>Analyzed file: <strong>{{ filename }}</strong></p>
     </section>
 
-    <section class="stats">
-        <div class="stat-card total">
+    <section class="stats-grid">
+        <div class="metric-card blue">
             <span>📄</span>
-        <h2 class="counter" data-target="{{ stats.total }}">0</h2>
+            <h2 class="counter" data-target="{{ stats.total }}">0</h2>
             <p>Total Records</p>
         </div>
 
-        <div class="stat-card unique">
+        <div class="metric-card green">
             <span>✅</span>
-      <h2 class="counter" data-target="{{ stats.unique }}">0</h2>
+            <h2 class="counter" data-target="{{ stats.unique }}">0</h2>
             <p>Unique Records</p>
         </div>
 
-        <div class="stat-card duplicate">
+        <div class="metric-card red">
             <span>⚠️</span>
-      <h2 class="counter" data-target="{{ stats.duplicates }}">0</h2>
+            <h2 class="counter" data-target="{{ stats.duplicates }}">0</h2>
             <p>Duplicate Records</p>
+        </div>
+
+        <div class="metric-card orange">
+            <span>💾</span>
+            <h2 class="counter" data-target="{{ stats.duplicates }}">0</h2>
+            <p>Storage Saved</p>
         </div>
     </section>
 
-    <section class="chart-section">
-        <h2>Upload Summary</h2>
-        <canvas id="dedupChart"></canvas>
+    <section class="analytics-grid">
+        <div class="panel">
+            <h2>Record Distribution</h2>
+            <canvas id="dedupChart"></canvas>
+        </div>
+
+        <div class="panel">
+            <h2>Deduplication Efficiency</h2>
+
+            <div class="progress-item">
+                <p>Unique Records: {{ stats.unique }} / {{ stats.total }}</p>
+                <div class="progress-track">
+                    <div class="progress-fill green-fill" style="width: {{ (stats.unique / stats.total * 100) | round(1) }}%;"></div>
+                </div>
+            </div>
+
+            <div class="progress-item">
+                <p>Duplicate Records: {{ stats.duplicates }} / {{ stats.total }}</p>
+                <div class="progress-track">
+                    <div class="progress-fill red-fill" style="width: {{ (stats.duplicates / stats.total * 100) | round(1) }}%;"></div>
+                </div>
+            </div>
+        </div>
     </section>
 
-    <section class="table-section">
+    <section class="table-panel">
         <h2>✅ Unique Records</h2>
         <input type="text" class="search-box" placeholder="Search unique records..." onkeyup="searchTable(this, 'uniqueTable')">
         <div class="table-wrapper" id="uniqueTable">
@@ -52,7 +78,7 @@
         </div>
     </section>
 
-    <section class="table-section duplicate-table">
+    <section class="table-panel danger-panel">
         <h2>⚠️ Duplicate Records</h2>
         <input type="text" class="search-box" placeholder="Search duplicate records..." onkeyup="searchTable(this, 'duplicateTable')">
         <div class="table-wrapper" id="duplicateTable">
@@ -62,27 +88,32 @@
 
     <a href="/" class="back-btn">⬅ Upload Another File</a>
 
-</div>
-  <div class="stat-card saved">
-    <span>💾</span>
-    <h2 class="counter" data-target="{{ stats.duplicates }}">0</h2>
-    <p>Storage Saved Records</p>
-  </div>
+</main>
+
 <footer>
     © 2026 Prashant Yadav | CodSoft Cloud Computing Internship
 </footer>
 
 <script>
-const ctx = document.getElementById('dedupChart');
-
-new Chart(ctx, {
+new Chart(document.getElementById('dedupChart'), {
     type: 'doughnut',
     data: {
         labels: ['Unique Records', 'Duplicate Records'],
         datasets: [{
             data: [{{ stats.unique }}, {{ stats.duplicates }}],
-            borderWidth: 2
+            backgroundColor: ['#22c55e', '#ef4444'],
+            borderColor: '#020617',
+            borderWidth: 3
         }]
+    },
+    options: {
+        plugins: {
+            legend: {
+                labels: {
+                    color: '#e5e7eb'
+                }
+            }
+        }
     }
 });
 
@@ -96,27 +127,25 @@ function searchTable(input, tableId) {
         rows[i].style.display = text.includes(filter) ? "" : "none";
     }
 }
-const counters = document.querySelectorAll(".counter");
 
-counters.forEach(counter => {
+document.querySelectorAll(".counter").forEach(counter => {
     const target = +counter.getAttribute("data-target");
     let count = 0;
-    const speed = 30;
+    const step = Math.max(1, Math.ceil(target / 30));
 
-    const updateCounter = () => {
-        const increment = Math.ceil(target / speed);
-
-        if (count < target) {
-            count += increment;
-            counter.innerText = count > target ? target : count;
-            setTimeout(updateCounter, 25);
-        } else {
+    function update() {
+        count += step;
+        if (count >= target) {
             counter.innerText = target;
+        } else {
+            counter.innerText = count;
+            setTimeout(update, 25);
         }
-    };
+    }
 
-    updateCounter();
+    update();
 });
 </script>
+
 </body>
 </html>
