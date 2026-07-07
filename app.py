@@ -41,9 +41,16 @@ def init_db():
 
 
 def generate_hash(row):
-    row_string = "|".join(map(str, row.values))
-    return hashlib.sha256(row_string.encode()).hexdigest()
+    ignored_columns = {"id", "student_id", "roll_no", "sr_no", "serial_no"}
 
+    filtered_data = []
+
+    for column, value in row.items():
+        if str(column).lower().strip() not in ignored_columns:
+            filtered_data.append(str(value).strip().lower())
+
+    row_string = "|".join(filtered_data)
+    return hashlib.sha256(row_string.encode()).hexdigest()
 
 @app.route("/")
 def home():
