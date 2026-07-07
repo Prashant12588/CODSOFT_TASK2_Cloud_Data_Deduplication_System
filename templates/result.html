@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Deduplication Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container wide">
+    <div class="card">
+        <h1>Deduplication Result</h1>
+        <p class="subtitle">File analyzed: <strong>{{ filename }}</strong></p>
+
+        <div class="stats">
+            <div class="stat-box">
+                <h2>{{ stats.total }}</h2>
+                <p>Total Records</p>
+            </div>
+
+            <div class="stat-box success">
+                <h2>{{ stats.unique }}</h2>
+                <p>Unique Records</p>
+            </div>
+
+            <div class="stat-box danger">
+                <h2>{{ stats.duplicates }}</h2>
+                <p>Duplicate Records</p>
+            </div>
+        </div>
+
+        <h2>Unique Data</h2>
+        <div class="table-wrapper">
+            {{ unique_table | safe }}
+        </div>
+
+        <h2>Duplicate Data</h2>
+        <div class="table-wrapper">
+            {{ duplicate_table | safe }}
+        </div>
+
+        <a href="/" class="back-btn">Upload Another File</a>
+    </div>
+</div>
+
+</body>
+</html>

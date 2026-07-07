@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cloud Data Deduplication System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1>Cloud Data Deduplication System</h1>
+        <p class="subtitle">Upload a CSV file to detect duplicate records using SHA-256 hashing.</p>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+<label for="file-upload" class="custom-file-upload">
+    📂 Choose CSV File
+</label>
+
+<input
+    id="file-upload"
+    type="file"
+    name="file"
+    accept=".csv"
+    required
+>
+<span id="file-name">No file selected</span>
+            <button type="submit">Upload & Analyze</button>
+        </form>
+    </div>
+</div>
+<script>
+const fileInput = document.getElementById("file-upload");
+const fileName = document.getElementById("file-name");
+
+fileInput.addEventListener("change", function () {
+    if (this.files.length > 0) {
+        fileName.textContent = this.files[0].name;
+    } else {
+        fileName.textContent = "No file selected";
+    }
+});
+</script>
+</body>
+</html>
